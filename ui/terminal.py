@@ -3,22 +3,17 @@ import getopt
 
 from app import app
 
-def parse(cmdLineArgs):
+def parse(cmd_line_args):
 
-    gymOptions = ['all','arvada', 'aurora', 'boulder','castlerock','centennial','denver','littleton','thornton']
+    #gymOptions = ['all','arvada', 'aurora', 'boulder','castlerock','centennial','denver','littleton','thornton']
 
-    try:
-        parser = argparse.ArgumentParser()
-        parser.add_argument("-g", help="Easton gym", choices=gymOptions, default="all")
-        parser.add_argument("--gym", help="Easton gym", choices=gymOptions, default="all")
-        args = parser.parse_args()
-        print(args)
-        #app.getData()
+    parser = argparse.ArgumentParser()
+    #parser.add_argument("-g", help="Easton gym", choices=gymOptions, default="all")
+    #parser.add_argument("--gym", help="Easton gym", choices=gymOptions, default="all")
+    args = parser.parse_args()
+    boulder_schedule_id = app.get_boulder_schedule_id()
+    print("Schedule ID:  %s" % (boulder_schedule_id))
 
-    except getopt.error as err:
-        print(str(err))
-        printHelp()
-        return -1
     return 0
 
 def printHelp():
