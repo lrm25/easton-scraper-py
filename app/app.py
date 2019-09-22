@@ -1,11 +1,23 @@
-from bs4 import BeautifulSoup
-from urllib.request import urlopen, Request
-
 from data.boulder_gym import BoulderGym
+from data.easton_class import EastonClass
+import storage.db as db
 
-def get_boulder_schedule_id():
+from .boulder_calendar import BoulderCalendar
+
+def retrieve_boulder_classes():
     
     boulder_gym = BoulderGym()
-    easton_request = Request(boulder_gym.get_url(), headers={'User-Agent': "lmccrone"})
-    schedule_page = urlopen(easton_request)
-    return boulder_gym.parse_schedule_id(schedule_page)
+    boulder_calendar = BoulderCalendar()
+    boulder_calendar.get_and_parse_data(boulder_gym)
+    easton_classes = boulder_gym.get_classes()
+    for easton_class in easton_classes:
+        print("{}, {}, {}, {}, {}".format(
+            easton_class.get_id(),
+            easton_class.get_name(), 
+            easton_class.get_start_time(),
+            easton_class.get_end_time(),
+            easton_class.get_instructor()))
+        db.write(easton_class)
+
+def print_boulder_classes():
+    db.load()

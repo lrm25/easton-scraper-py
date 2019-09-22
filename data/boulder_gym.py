@@ -5,11 +5,13 @@ class BoulderGym:
 
     def __init__(self):
         self._url = "https://eastonbjj.com/boulder/schedule"
+        self._classes = []
 
     def get_url(self):
         return self._url
 
-    def parse_schedule_id(self, page_html_data):
-        soup = BeautifulSoup(page_html_data, "html.parser")
-        schedule_id = soup.find_all('healcode-widget')[0]['data-widget-id']
-        return schedule_id
+    def add_class(self, easton_class):
+        self._classes.append(easton_class)
+
+    def get_classes(self):
+        return self._classes
