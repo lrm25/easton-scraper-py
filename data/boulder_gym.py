@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 from urllib.request import urlopen, Request
 
+
 class BoulderGym:
 
     def __init__(self):

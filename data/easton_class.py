@@ -1,11 +1,14 @@
 def easton_class_sort():
     return lambda e : (e.get_sortable_start_time(), e.get_sortable_end_time())
 
+
 class EastonClass:
 
-    def __init__(self, id, name, start_time, end_time):
+    def __init__(self, gym_name, id, name, date, start_time, end_time):
         self._id = id
+        self._gym_name = gym_name
         self._name = name
+        self._date = date
         self._start_time = start_time
         self._end_time = end_time
         self._instructor = ""
@@ -41,3 +44,12 @@ class EastonClass:
     
     def get_sortable_end_time(self):
         return self._sortable_end_time
+
+    def set_date(self, date):
+        self._date = date
+
+    def get_date(self):
+        return self._date
+
+    def get_gym_name(self):
+        return self._gym_name
