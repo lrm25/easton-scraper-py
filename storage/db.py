@@ -1,7 +1,8 @@
-from datetime import datetime
+from datetime import date, datetime
+import ast
 import os
 
-from data.easton_class import easton_class_sort, EastonClass
+from data.easton_class import EastonClass
 
 DB_VERSION = 1
 
@@ -15,6 +16,8 @@ IDX_END_TIME = 6
 IDX_INSTRUCTOR = 7
 IDX_SORTABLE_START_TIME = 8
 IDX_SORTABLE_END_TIME = 9
+IDX_CANCELLED = 10
+IDX_DESCRIPTION_LINK = 11
 
 
 def write(easton_class):
@@ -30,19 +33,39 @@ def write(easton_class):
     f.write("{}{}".format(easton_class.get_instructor(), os.linesep))
     f.write("{}{}".format(easton_class.get_sortable_start_time(), os.linesep))
     f.write("{}{}".format(easton_class.get_sortable_end_time(), os.linesep))
+    f.write("{}{}".format(easton_class.get_cancelled(), os.linesep))
+    f.write("{}{}".format(easton_class.get_description_link(), os.linesep))
 
     f.close()
 
 
+def delete_classes_done_before_now():
+
+    files_to_delete = []
+    now = datetime.now()
+
+    for db_file in os.listdir("storage/db"):
+        full_name = "storage/db/{}".format(db_file)
+        with open(full_name, "r") as f:
+            lines = f.readlines()
+            if lines[IDX_DB_VERSION].strip() == str(DB_VERSION):
+                class_end_time = datetime.strptime(lines[IDX_SORTABLE_END_TIME].strip(), "%Y-%m-%d %H:%M:%S")
+                if class_end_time < now:
+                    files_to_delete.append(full_name)
+
+    for file_to_delete in files_to_delete:
+        os.remove(file_to_delete)
+
+
 def load(class_day_list):
-    print("*****")
     print(class_day_list)
     easton_classes = []
     for db_file in os.listdir("storage/db"):
         with open("storage/db/{}".format(db_file), "r") as f:
             lines = f.readlines()
             if lines[IDX_DB_VERSION].strip() == str(DB_VERSION):
-                if lines[IDX_CLASS_ID].strip() not in class_day_list:
+                print(lines[IDX_DATE])
+                if lines[IDX_DATE].strip() not in class_day_list:
                     continue
 
                 easton_class = EastonClass(lines[IDX_GYM_NAME].strip(),
@@ -56,8 +79,18 @@ def load(class_day_list):
                                                                        "%Y-%m-%d %H:%M:%S"))
                 easton_class.set_sortable_end_time(datetime.strptime(lines[IDX_SORTABLE_END_TIME].strip(),
                                                                      "%Y-%m-%d %H:%M:%S"))
+                easton_class.set_cancelled(ast.literal_eval(lines[IDX_CANCELLED]))
+                easton_class.set_description_link(lines[IDX_DESCRIPTION_LINK])
                 easton_classes.append(easton_class)
-    easton_classes.sort(key=easton_class_sort())
-    for ec in easton_classes:
-        print("{}, {}, {}, {}, {}, {}".format(ec.get_gym_id(), ec.get_name(), ec.get_date(), ec.get_start_time(),
-                                              ec.get_end_time(), ec.get_instructor()))
+    return easton_classes
+
+
+def get_class_description_link(gym_name, class_id):
+    db_string = "{}_{}.db".format(gym_name, class_id)
+    for db_file in os.listdir("storage/db"):
+        if db_file.lower() == db_string:
+            with open("storage/db/{}".format(db_file), "r") as f:
+                lines = f.readlines()
+                description_link = lines[IDX_DESCRIPTION_LINK]
+                break
+    return description_link

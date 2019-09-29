@@ -1,5 +1,3 @@
-def easton_class_sort():
-    return lambda e : (e.get_sortable_start_time(), e.get_sortable_end_time())
 
 
 class EastonClass:
@@ -14,6 +12,9 @@ class EastonClass:
         self._instructor = ""
         self._sortable_start_time = ""
         self._sortable_end_time = ""
+        self._cancelled = False
+        self._description_link = ""
+        self._description = ""
 
     def get_id(self):
         return self._id
@@ -53,3 +54,21 @@ class EastonClass:
 
     def get_gym_name(self):
         return self._gym_name
+
+    def set_cancelled(self, cancelled):
+        self._cancelled = cancelled
+
+    def get_cancelled(self):
+        return self._cancelled
+
+    def set_description_link(self, description_link):
+        self._description_link = description_link
+
+    def get_description_link(self):
+        return self._description_link
+
+    def set_description(self, description):
+        self._description = description
+
+    def get_description(self):
+        return self._description
