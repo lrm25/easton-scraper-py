@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from data.easton_class import EastonClass
 from storage import db
@@ -17,7 +17,9 @@ from . import html_request
 def get_calendar_daily_data(gym, first_date):
 
     date_string = first_date.strftime("%Y-%m-%d")
-    soup = html_request.request(gym.get_url()+"?DATE="+date_string+"&VIEW=WEEK")
+    # TODO only need to load once a week, not every day
+    soup = html_request.request(gym.get_url() + "?DATE=" + date_string + "&VIEW=WEEK")
+    print("Retrieving {} data for {} gym".format(date_string, gym.get_name()))
     day_schedule = soup.find('div', {'date': date_string})
     calendar_classes = day_schedule.find_all('div', {'class': 'item'})
     # strip string "calendar.cfm" (12 chars)
@@ -27,10 +29,10 @@ def get_calendar_daily_data(gym, first_date):
         # Class info URL query is in single quotes in 'onclick' attribute
         # FORMAT:  onclick="checkLoggedId('enrollment.cfm?appointmentId=<id>')"
         class_link_attr = calendar_class.get('onclick')
-        print("CLASS LINK ATTR: {}".format(class_link_attr))
         class_link_query = class_link_attr.split('\'')[1]
         class_id = class_link_query.split('?')[1].split('=')[1]
-        class_soup = html_request.request("{}{}".format(webpage_base, class_link_query))
+        class_link = "{}{}".format(webpage_base, class_link_query)
+        class_soup = html_request.request(class_link)
         class_rows = class_soup.find_all('tr')
         class_time = ""
         instructor = "Staff"
@@ -55,6 +57,23 @@ def get_calendar_daily_data(gym, first_date):
         easton_class.set_instructor(instructor)
         easton_class.set_sortable_start_time(sortable_start_time)
         easton_class.set_sortable_end_time(sortable_end_time)
+        easton_class.set_description_link(class_link)
         gym.add_class(easton_class)
         db.write(easton_class)
+
+
+def get_class_description(description_link):
+
+    description = ""
+    soup = html_request.request(description_link)
+    divs = soup.find_all('div')
+    for div in divs:
+        # Identification:  div class="spaceBelow", no children
+        div_class = div.get('class')
+        if div_class is not None and 'spaceBelow' in div_class and not div.find('div'):
+            description = div.text
+            break
+    if description == "":
+        description = " *** No description given on website *** "
+    return description
 

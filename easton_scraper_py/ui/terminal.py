@@ -1,13 +1,18 @@
 import argparse
-import getopt
 from datetime import date, datetime, timedelta
 
 from app import app
 
 
+#
+# get command line arguments and send to application code to be processed
+#
 def parse(cmd_line_args):
 
     gym_options = ['all', 'arvada', 'aurora', 'boulder', 'castlerock', 'centennial', 'denver', 'littleton', 'thornton']
+
+    print()
+    print()
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--load", help="Only load classes from local disk", action='store_true')
@@ -26,8 +31,10 @@ def parse(cmd_line_args):
     parser.add_argument("--description", help="Get description for class with this ID", default="")
     args = parser.parse_args()
 
+    # If user specifies, delete classes yesterday and before
     if args.delete:
         app.delete_old_classes()
+
     if args.tomorrow:
         class_date = date.today() + timedelta(days=1)
     elif args.weekday:
@@ -41,17 +48,20 @@ def parse(cmd_line_args):
     else:
         class_date = date.today()
 
-    print(args.gyms)
+    # Either load classes from "db" or retrieve from internet
     if args.load:
         app.load_boulder_classes(class_date, args.gyms, args.days)
     else:
         app.retrieve_boulder_classes(class_date, args.gyms, args.days)
+
+    # Since different gyms could possibly have same ID for class (I don't actually know), play it safe
     if args.description != "":
-        # TODO change!  specify only one gym field
+        if not args.gyms or 1 < len(args.gyms):
+            raise TypeError("Must have exactly one gym value when retrieving description")
         app.get_class_description(args.gyms[0], args.description)
     else:
         app.print_boulder_classes(class_date, args.days, args.and_string, args.or_string, args.not_string, args.teacher,
-                              args.no_cancelled, args.ids)
+                                  args.no_cancelled, args.ids)
 
     return 0
 

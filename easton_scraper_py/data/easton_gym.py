@@ -27,7 +27,7 @@ gym_dict = {}
 
 
 def easton_class_sort():
-    return lambda e : (e.get_sortable_start_time(), e.get_sortable_end_time())
+    return lambda e: (e.get_sortable_start_time(), e.get_sortable_end_time())
 
 
 class EastonGym:

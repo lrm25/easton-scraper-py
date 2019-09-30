@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import datetime
 import ast
 import os
 
@@ -22,7 +22,7 @@ IDX_DESCRIPTION_LINK = 11
 
 def write(easton_class):
 
-    f = open("storage/db/{}_{}.db".format(easton_class.get_gym_name(), easton_class.get_id()), "w")
+    f = open("storage/db/{}_{}.db".format(easton_class.get_gym_name().replace(" ", "_"), easton_class.get_id()), "w")
     f.write("{}{}".format(DB_VERSION, os.linesep))
     f.write("{}{}".format(easton_class.get_gym_name(), os.linesep))
     f.write("{}{}".format(easton_class.get_id(), os.linesep))
@@ -39,13 +39,13 @@ def write(easton_class):
     f.close()
 
 
-def delete_classes_done_before_now():
+def delete_classes_done_before_today():
 
     files_to_delete = []
     now = datetime.now()
 
     for db_file in os.listdir("storage/db"):
-        full_name = "storage/db/{}".format(db_file)
+        full_name = "storage/db/{}".format(db_file).replace(" ", "_")
         with open(full_name, "r") as f:
             lines = f.readlines()
             if lines[IDX_DB_VERSION].strip() == str(DB_VERSION):
@@ -58,13 +58,12 @@ def delete_classes_done_before_now():
 
 
 def load(class_day_list):
-    print(class_day_list)
+
     easton_classes = []
     for db_file in os.listdir("storage/db"):
         with open("storage/db/{}".format(db_file), "r") as f:
             lines = f.readlines()
             if lines[IDX_DB_VERSION].strip() == str(DB_VERSION):
-                print(lines[IDX_DATE])
                 if lines[IDX_DATE].strip() not in class_day_list:
                     continue
 
@@ -86,11 +85,18 @@ def load(class_day_list):
 
 
 def get_class_description_link(gym_name, class_id):
+
+    lines = []
+    description_link = ""
     db_string = "{}_{}.db".format(gym_name, class_id)
+
     for db_file in os.listdir("storage/db"):
-        if db_file.lower() == db_string:
+        if db_file.lower() == db_string.lower():
             with open("storage/db/{}".format(db_file), "r") as f:
                 lines = f.readlines()
                 description_link = lines[IDX_DESCRIPTION_LINK]
                 break
+    if not lines:
+        raise ValueError("No class at gym {} with ID {} found".format(gym_name, class_id))
+
     return description_link
