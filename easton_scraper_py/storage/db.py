@@ -39,7 +39,7 @@ def write(easton_class):
     f.close()
 
 
-def delete_classes_done_before_today():
+def delete_classes_done_before_now():
 
     files_to_delete = []
     now = datetime.now()
@@ -97,6 +97,6 @@ def get_class_description_link(gym_name, class_id):
                 description_link = lines[IDX_DESCRIPTION_LINK]
                 break
     if not lines:
-        raise ValueError("No class at gym {} with ID {} found".format(gym_name, class_id))
+        raise ValueError("No class at {} gym with ID {} found".format(gym_name, class_id))
 
     return description_link

@@ -1,3 +1,6 @@
 # easton-scraper-py
 
-Under construction
+## Testing
+
+export PYTHONPATH=$PYTHONPATH:$PWD
+python -m unittest discover

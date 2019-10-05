@@ -5,7 +5,7 @@ from data import easton_gym
 from data.easton_gym import EastonGym
 import storage.db as db
 
-from . import mindbody_calendar, zen_calendar
+from . import easton_calendar, mindbody_calendar, zen_calendar
 
 
 def convert_weekday_to_days_ahead(weekday):
@@ -22,15 +22,15 @@ def convert_weekday_to_days_ahead(weekday):
 
 def delete_old_classes():
 
-    db.delete_classes_done_before_today()
+    db.delete_classes_done_before_now()
 
 
-def retrieve_boulder_classes(class_date, gyms, number_of_days):
+def retrieve_classes(class_date, gyms, number_of_days):
     
-    mindbody_calendar.get_and_parse_gyms_data(class_date, gyms, number_of_days)
+    easton_calendar.get_and_parse_gyms_data(class_date, gyms, number_of_days)
 
 
-def load_boulder_classes(class_start_date, gyms, number_of_days):
+def load_classes(class_start_date, gyms, number_of_days):
 
     class_day_list = []
     for day_offset in range(number_of_days):
@@ -92,7 +92,7 @@ def get_class_description(gym_name, class_id):
 
     try:
         link = db.get_class_description_link(gym_name, class_id)
-        if gym_name == 'castlerock' or gym_name == 'thornton':
+        if gym_name == 'Castle_Rock' or gym_name == 'Thornton':
             description = zen_calendar.get_class_description(link)
         else:
             description = mindbody_calendar.get_class_description(link)
@@ -102,8 +102,8 @@ def get_class_description(gym_name, class_id):
         print(e)
 
 
-def print_boulder_classes(class_start_date, number_of_days, and_strings, or_strings, not_strings,
-                          instructor, no_cancelled, ids):
+def print_classes(class_start_date, number_of_days, and_strings, or_strings, not_strings,
+                  instructor, no_cancelled, ids):
 
     matches = False
     for day_offset in range(number_of_days):

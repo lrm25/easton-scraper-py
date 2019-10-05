@@ -8,7 +8,8 @@ from ui import terminal
 #
 def main():
     try:
-        terminal.parse(sys.argv[1:])
+        # we use argparse, so we don't need to pass the command line params in
+        terminal.parse()
     except TypeError as err:
         print(err)
 
