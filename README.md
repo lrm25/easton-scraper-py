@@ -37,7 +37,7 @@ Or if using a virtual environment, in the base folder:
 * ``pip install bs4``
 
 If running unit tests:
-    * ``pip3 install mock``
+* ``pip3 install mock``
 
 ### Other
 This program was written in and run on Linux Mint (Ubuntu), but should work for any system with Python 3 installed, provided the equivalent installations are performed on the system.
