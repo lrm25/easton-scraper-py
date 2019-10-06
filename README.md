@@ -30,10 +30,12 @@ The user can retrieve data from all eight Easton gyms, have it stored locally, a
 Python 3 must be installed.  BeautifulSoup as well.  To install, run the following commands:
 * ``sudo apt-get install python3 python3-pip``
 * ``pip3 install bs4``
+
 Or if using a virtual environment, in the base folder:
 * ``python3 -m venv env``
 * ``. env/bin/activate``
 * ``pip install bs4``
+
 If running unit tests:
     * ``pip3 install mock``
 
