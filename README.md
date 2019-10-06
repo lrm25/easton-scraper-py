@@ -28,23 +28,29 @@ The user can retrieve data from all eight Easton gyms, have it stored locally, a
 
 ### Ubuntu Linux
 Python 3 must be installed.  BeautifulSoup as well.  To install, run the following commands:
-* ``sudo apt-get install python3 python3-pip``
-* ``pip3 install bs4``
+```
+sudo apt-get install python3 python3-pip
+pip3 install bs4
+```
 
 Or if using a virtual environment, in the base folder:
-* ``python3 -m venv env``
-* ``. env/bin/activate``
-* ``pip install bs4``
+```
+python3 -m venv env
+env/bin/activate
+pip install bs4
+```
 
 If running unit tests:
-* ``pip3 install mock``
+```
+pip3 install mock
+```
 
 ### Other
 This program was written in and run on Linux Mint (Ubuntu), but should work for any system with Python 3 installed, provided the equivalent installations are performed on the system.
 
 ## Testing
 To run unit tests, enter the following commands:
-* In the folder with ``scraper.py``: 
+* In the folder with **scraper.py**: 
 	* ``export PYTHONPATH=$PYTHONPATH:$PWD``
 * To run the tests, in the base repository folder:
 	* ``python3 -m unittest discover -v``
