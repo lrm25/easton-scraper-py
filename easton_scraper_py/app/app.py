@@ -8,6 +8,10 @@ import storage.db as db
 from . import easton_calendar, mindbody_calendar, zen_calendar
 
 
+#
+# Convert weekday option to numerical day parameter, so this parameter can be added to the current day to get the
+# desired date.
+#
 def convert_weekday_to_days_ahead(weekday):
 
     day_list = [day_name.lower() for day_name in list(calendar.day_name)]
@@ -20,16 +24,27 @@ def convert_weekday_to_days_ahead(weekday):
     return day_index - date.today().weekday()
 
 
+#
+# Delete easton classes stored in local files, that have completed before the time the user queries this function.
+#
 def delete_old_classes():
 
     db.delete_classes_done_before_now()
 
 
+#
+# Retrieve all class data from the internet, for the given gyms (all if 'gyms' is empty), the starting class date,
+# and for the total number of days starting with that starting class date
+#
 def retrieve_classes(class_date, gyms, number_of_days):
     
-    easton_calendar.get_and_parse_gyms_data(class_date, gyms, number_of_days)
+    easton_calendar.get_and_parse_gyms_data(gyms, class_date, number_of_days)
 
 
+#
+# Load classes from disk or db
+# Return:  True if any classes loaded, False if not
+#
 def load_classes(class_start_date, gyms, number_of_days):
 
     class_day_list = []
@@ -37,18 +52,29 @@ def load_classes(class_start_date, gyms, number_of_days):
         offset_date = class_start_date + timedelta(day_offset)
         class_day_list.append(offset_date.strftime("%Y-%m-%d"))
     easton_classes = db.load(class_day_list)
+    if not len(easton_classes):
+        print(" *** No classes found.  Try removing --load tag to retrieve *** ")
+        return False
+
     for easton_class in easton_classes:
-        gym_name = easton_class.get_gym_name()
-        if not len(gyms) or gym_name.replace(" ", "").lower() in gyms:
+        gym_db_name = easton_class.get_gym_db_name()
+        if not len(gyms) or gym_db_name in gyms:
             try:
-                gym = easton_gym.gym_dict[gym_name]
+                gym = easton_gym.gym_dict[gym_db_name]
             except KeyError:
-                gym = EastonGym(easton_gym.gym_tuple_dict[gym_name])
+                if not easton_gym.gym_tuple_idx_map:
+                    easton_gym.create_tuple_map()
+                gym = EastonGym(easton_gym.gym_tuple_idx_map[gym_db_name])
+                easton_gym.gym_dict[gym_db_name] = gym
             gym.add_class(easton_class)
     for gym in easton_gym.gym_dict.values():
         gym.sort_classes()
+    return True
 
 
+#
+# Return true if the class name contains one of the OR strings
+#
 def or_search(easton_class_name, or_strings):
 
     if not or_strings:
@@ -59,6 +85,9 @@ def or_search(easton_class_name, or_strings):
     return False
 
 
+#
+# Return true if the class name does not contain any of the NOT strings
+#
 def not_search(easton_class_name, not_strings):
     if not not_strings:
         return True
@@ -68,6 +97,9 @@ def not_search(easton_class_name, not_strings):
     return True
 
 
+#
+# Return true if the class name contains all of the AND strings
+#
 def and_search(easton_class_name, and_strings):
 
     if not and_strings:
@@ -78,6 +110,10 @@ def and_search(easton_class_name, and_strings):
     return True
 
 
+#
+# AND, OR, and NOT search the easton class name depending on what the user wants (see each individual
+# function for descriptions)
+#
 def string_searches(easton_class_name, and_strings, or_strings, not_strings):
 
     lowercase_name = easton_class_name.lower()
@@ -85,23 +121,30 @@ def string_searches(easton_class_name, and_strings, or_strings, not_strings):
         not_search(lowercase_name, not_strings)
 
 
+#
+# get class description from webpage, using gym name and class ID
+#
 def get_class_description(gym_name, class_id):
 
     if gym_name == 'castlerock':
         gym_name = 'Castle_Rock'
 
-    try:
-        link = db.get_class_description_link(gym_name, class_id)
-        if gym_name == 'Castle_Rock' or gym_name == 'Thornton':
-            description = zen_calendar.get_class_description(link)
-        else:
-            description = mindbody_calendar.get_class_description(link)
-        print(description)
+    link = db.get_class_description_link(gym_name, class_id)
+    if gym_name == 'Castle_Rock' or gym_name == 'Thornton':
+        description = zen_calendar.get_class_description(link)
+    else:
+        description = mindbody_calendar.get_class_description(link)
 
-    except ValueError as e:
-        print(e)
+    return description
 
 
+#
+# Print requested class info out to terminal which matches all parameters below
+# and_strings, or_strings, not_strings:  see search functions above
+# instructor:  string which can be used to search for classes by a certain teacher
+# no_cancelled:  only print classes that are not cancelled
+# ids:  print class IDs, which can be used to retrieve class description
+#
 def print_classes(class_start_date, number_of_days, and_strings, or_strings, not_strings,
                   instructor, no_cancelled, ids):
 
@@ -111,7 +154,8 @@ def print_classes(class_start_date, number_of_days, and_strings, or_strings, not
         class_date_object = class_start_date + timedelta(days=day_offset)
         class_date = class_date_object.strftime("%Y-%m-%d")
         fancy_class_date = class_date_object.strftime("%A, %B %d, %Y")
-        for gym in easton_gym.gym_dict.values():
+        for gym_key in sorted(easton_gym.gym_dict.keys()):
+            gym = easton_gym.gym_dict[gym_key]
             gym_match = False
             for easton_class in gym.get_classes(class_date):
                 if string_searches(easton_class.get_name(), and_strings, or_strings, not_strings) and \

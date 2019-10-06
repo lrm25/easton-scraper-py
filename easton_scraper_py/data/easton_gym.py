@@ -1,46 +1,84 @@
-# Gym calendars
+# Gym calendar types
 MINDBODY = 1
 ZEN = 2
 
-# Gym tuples
-ARVADA = ('Arvada', MINDBODY, "https://eastonbjj.com/arvada/schedule")
-AURORA = ('Aurora', MINDBODY, "https://eastonbjj.com/aurora/schedule")
-BOULDER = ('Boulder', MINDBODY, "https://eastonbjj.com/boulder/schedule")
-CASTLE_ROCK = ('Castle Rock', ZEN, "https://etc-castlerock.sites.zenplanner.com/calendar.cfm")
-CENTENNIAL = ('Centennial', MINDBODY, "https://eastonbjj.com/centennial/schedule")
-DENVER = ('Denver', MINDBODY, "https://eastonbjj.com/denver/schedule")
-LITTLETON = ('Littleton', MINDBODY, "https://eastonbjj.com/littleton/schedule")
-THORNTON = ('Thornton', ZEN, "https://eastonbjjnorth.sites.zenplanner.com/calendar.cfm")
+# Gym tuple indices
+IDX_TAG_NAME = 0
+IDX_NAME = 1
+IDX_CALENDAR_TYPE = 2
+IDX_CALENDAR_URL = 3
 
-gym_tuple_dict = {
-    'Arvada': ARVADA,
-    'Aurora': AURORA,
-    'Boulder': BOULDER,
-    'Castle Rock': CASTLE_ROCK,
-    'Centennial': CENTENNIAL,
-    'Denver': DENVER,
-    'Littleton': LITTLETON,
-    'Thornton': THORNTON,
+# Gym indices
+IDX_ARVADA = 0
+IDX_AURORA = 1
+IDX_BOULDER = 2
+IDX_CASTLE_ROCK = 3
+IDX_CENTENNIAL = 4
+IDX_DENVER = 5
+IDX_LITTLETON = 6
+IDX_THORNTON = 7
+
+# Gym data retrieval info tuples
+GYM_TUPLES = [
+    ('arvada', 'Arvada', MINDBODY, "https://eastonbjj.com/arvada/schedule"),
+    ('aurora', 'Aurora', MINDBODY, "https://eastonbjj.com/aurora/schedule"),
+    ('boulder', 'Boulder', MINDBODY, "https://eastonbjj.com/boulder/schedule"),
+    ('castlerock', 'Castle Rock', ZEN, "https://etc-castlerock.sites.zenplanner.com/calendar.cfm"),
+    ('centennial', 'Centennial', MINDBODY, "https://eastonbjj.com/centennial/schedule"),
+    ('denver', 'Denver', MINDBODY, "https://eastonbjj.com/denver/schedule"),
+    ('littleton', 'Littleton', MINDBODY, "https://eastonbjj.com/littleton/schedule"),
+    ('thornton', 'Thornton', ZEN, "https://eastonbjjnorth.sites.zenplanner.com/calendar.cfm")
+    ]
+
+# Attribute used to retrieve numerical class ID for Mindbody calendars (Littleton's is different for some reason)
+mindbody_class_id = {
+    'arvada': 'data-hc-mbo-class-id',
+    'aurora': 'data-hc-mbo-class-id',
+    'boulder': 'data-hc-mbo-class-id',
+    'centennial': 'data-hc-mbo-class-id',
+    'denver': 'data-hc-mbo-class-id',
+    'littleton': 'data-bw-widget-mbo-class-id'
 }
 
+gym_tuple_idx_map = {}
+
+# Allows external modules to retrieve gym objects
 gym_dict = {}
 
 
+#
+# fill so that tuples can be retrieved by tag name as well as index
+#
+def create_tuple_map():
+    for tuple in GYM_TUPLES:
+        gym_tuple_idx_map[tuple[IDX_TAG_NAME]] = tuple
+
+
+#
+# Sort easton classes by start time, then end time, to organize class display
+#
 def easton_class_sort():
     return lambda e: (e.get_sortable_start_time(), e.get_sortable_end_time())
 
 
+#
+# Class representing Easton gym, containing info to retrieve classes, as well as retrieved class info from the internet
+# or from local disk, if already retrieved and stored previously.
+#
 class EastonGym:
 
     def __init__(self, gym_tuple):
-        self._name = gym_tuple[0]
-        self._type = gym_tuple[1]
-        self._url = gym_tuple[2]
+        self._name = gym_tuple[IDX_NAME]
+        self._db_name = gym_tuple[IDX_TAG_NAME]
+        self._type = gym_tuple[IDX_CALENDAR_TYPE]
+        self._url = gym_tuple[IDX_CALENDAR_URL]
         self._classes = []
-        gym_dict[self._name] = self
 
     def get_name(self):
         return self._name
+
+    def get_db_name(self):
+        return self._db_name
 
     def get_type(self):
         return self._type
@@ -48,10 +86,9 @@ class EastonGym:
     def get_url(self):
         return self._url
 
-    def get_classes(self):
-        return self._classes
-
-    def get_classes(self, date):
+    def get_classes(self, date=None):
+        if not date:
+            return self._classes
         classes_on_date = []
         for easton_class in self._classes:
             if easton_class.get_date() == date:

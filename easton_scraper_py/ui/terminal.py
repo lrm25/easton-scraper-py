@@ -2,6 +2,7 @@ import argparse
 from datetime import date, datetime, timedelta
 
 from app import app
+from data.easton_gym import GYM_TUPLES, IDX_TAG_NAME
 
 
 #
@@ -9,8 +10,8 @@ from app import app
 #
 def parse():
 
-    gym_options = ['arvada', 'aurora', 'boulder', 'castlerock', 'centennial', 'denver', 'littleton', 'thornton']
-    MAX_DAYS_ALLOWED = 10
+    gym_options = [gym_tuple[IDX_TAG_NAME] for gym_tuple in GYM_TUPLES]
+    max_days_allowed = 10
 
     print()
     print()
@@ -38,8 +39,12 @@ def parse():
     if args.delete:
         app.delete_old_classes()
 
-    if MAX_DAYS_ALLOWED < args.days:
-        print("Number of days: {} is too large, max allowed is {}".format(args.days, MAX_DAYS_ALLOWED))
+    # check day parameter
+    if max_days_allowed < args.days:
+        print("Number of days: {} is too large, max allowed is {}".format(args.days, max_days_allowed))
+        return
+    if args.days < 1:
+        print("Invalid number of days:  {}".format(args.days))
         return
 
     if args.tomorrow:
@@ -55,17 +60,26 @@ def parse():
     else:
         class_date = date.today()
 
-    # Either load classes from "db" or retrieve from internet
-    if args.load:
-        app.load_classes(class_date, args.gyms, args.days)
-    else:
-        app.retrieve_classes(class_date, args.gyms, args.days)
-
     # Since different gyms could possibly have same ID for class (I don't actually know), play it safe
     if args.description != "":
         if not args.gyms or 1 < len(args.gyms):
             raise TypeError("Must have exactly one gym value when retrieving description")
-        app.get_class_description(args.gyms[0], args.description)
+
+    # Either load classes from "db" or retrieve from internet
+    if args.load:
+        if not app.load_classes(class_date, args.gyms, args.days):
+            return 0
+    else:
+        app.retrieve_classes(class_date, args.gyms, args.days)
+        print()
+        print()
+
+    if args.description != "":
+        try:
+            description = app.get_class_description(args.gyms[0], args.description)
+            print(description)
+        except ValueError as e:
+            print(e)
     else:
         app.print_classes(class_date, args.days, args.and_string, args.or_string, args.not_string, args.teacher,
                           args.no_cancelled, args.ids)

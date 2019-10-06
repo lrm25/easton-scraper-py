@@ -1,10 +1,14 @@
 
 
+#
+# class representing a single easton class at any school, and containing necessary data
+#
 class EastonClass:
 
-    def __init__(self, gym_name, id, name, date, start_time, end_time):
-        self._id = id
+    def __init__(self, gym_name, gym_db_name, class_id, name, date, start_time, end_time):
+        self._id = class_id
         self._gym_name = gym_name
+        self._gym_db_name = gym_db_name
         self._name = name
         self._date = date
         self._start_time = start_time
@@ -55,12 +59,18 @@ class EastonClass:
     def get_gym_name(self):
         return self._gym_name
 
+    def get_gym_db_name(self):
+        return self._gym_db_name
+
     def set_cancelled(self, cancelled):
         self._cancelled = cancelled
 
     def get_cancelled(self):
         return self._cancelled
 
+    #
+    # descriptions can be pulled by the user, if desired (currently optional)
+    #
     def set_description_link(self, description_link):
         self._description_link = description_link
 

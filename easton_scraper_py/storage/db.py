@@ -20,9 +20,13 @@ IDX_CANCELLED = 10
 IDX_DESCRIPTION_LINK = 11
 
 
+#
+# write easton class data to text file, so it can be retrieved without querying internet if desired
+#
 def write(easton_class):
 
-    f = open("storage/db/{}_{}.db".format(easton_class.get_gym_name().replace(" ", "_"), easton_class.get_id()), "w")
+    f = open("storage/db/{}_{}.db".format(easton_class.get_gym_db_name(), easton_class.get_id()), "w")
+
     f.write("{}{}".format(DB_VERSION, os.linesep))
     f.write("{}{}".format(easton_class.get_gym_name(), os.linesep))
     f.write("{}{}".format(easton_class.get_id(), os.linesep))
@@ -39,6 +43,9 @@ def write(easton_class):
     f.close()
 
 
+#
+# delete old files containing class data
+#
 def delete_classes_done_before_now():
 
     files_to_delete = []
@@ -57,10 +64,19 @@ def delete_classes_done_before_now():
         os.remove(file_to_delete)
 
 
+#
+# load classes from files
+#
 def load(class_day_list):
 
     easton_classes = []
     for db_file in os.listdir("storage/db"):
+        db_file_split = db_file.split('_')
+        if len(db_file_split) == 1:
+            print("Warning:  invalid filename in db folder, no underscore: {}".format(db_file))
+            continue
+
+        gym_db_name = db_file_split[0]
         with open("storage/db/{}".format(db_file), "r") as f:
             lines = f.readlines()
             if lines[IDX_DB_VERSION].strip() == str(DB_VERSION):
@@ -68,6 +84,7 @@ def load(class_day_list):
                     continue
 
                 easton_class = EastonClass(lines[IDX_GYM_NAME].strip(),
+                                           gym_db_name,
                                            lines[IDX_CLASS_ID].strip(),
                                            lines[IDX_NAME].strip(),
                                            lines[IDX_DATE].strip(),
@@ -84,6 +101,9 @@ def load(class_day_list):
     return easton_classes
 
 
+#
+# Pull the description link from file matching gym name and class ID, so description can be retrieved from internet
+#
 def get_class_description_link(gym_name, class_id):
 
     lines = []
