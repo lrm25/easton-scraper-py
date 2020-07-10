@@ -1,6 +1,9 @@
 # Easton Scraper
 A portfolio project which consolidates data from the Easton gyms in the Denver area, and allows a user to search classes at all gyms at once.
 
+## Under Construction
+Currently not working due to Easton scheduling software change and closure of a gym.
+
 ## Operation
 The user can retrieve data from all eight Easton gyms, have it stored locally, and search class names and instructors.  Enter the **easton_scraper_py** folder, then the commands below can be entered.
 
