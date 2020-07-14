@@ -12,10 +12,10 @@ IDX_CALENDAR_URL = 3
 IDX_ARVADA = 0
 IDX_AURORA = 1
 IDX_BOULDER = 2
-IDX_CASTLE_ROCK = 3
-IDX_CENTENNIAL = 4
-IDX_DENVER = 5
-IDX_LITTLETON = 6
+IDX_CENTENNIAL = 3
+IDX_DENVER = 4
+IDX_LITTLETON = 5
+IDX_LONGMONT = 6
 IDX_THORNTON = 7
 
 # Gym data retrieval info tuples
@@ -23,21 +23,24 @@ GYM_TUPLES = [
     ('arvada', 'Arvada', MINDBODY, "https://eastonbjj.com/arvada/schedule"),
     ('aurora', 'Aurora', MINDBODY, "https://eastonbjj.com/aurora/schedule"),
     ('boulder', 'Boulder', MINDBODY, "https://eastonbjj.com/boulder/schedule"),
-    ('castlerock', 'Castle Rock', ZEN, "https://etc-castlerock.sites.zenplanner.com/calendar.cfm"),
+    #('castlerock', 'Castle Rock', ZEN, "https://etc-castlerock.sites.zenplanner.com/calendar.cfm"),
     ('centennial', 'Centennial', MINDBODY, "https://eastonbjj.com/centennial/schedule"),
     ('denver', 'Denver', MINDBODY, "https://eastonbjj.com/denver/schedule"),
     ('littleton', 'Littleton', MINDBODY, "https://eastonbjj.com/littleton/schedule"),
+    ('longmont', 'Longmont', MINDBODY, "https://eastonbjj.com/longmont/schedule"),
     ('thornton', 'Thornton', ZEN, "https://eastonbjjnorth.sites.zenplanner.com/calendar.cfm")
     ]
 
-# Attribute used to retrieve numerical class ID for Mindbody calendars (Littleton's is different for some reason)
+# Attribute used to retrieve numerical class ID for Mindbody calendars (some were different in the past,
+# but as of Jul 14 2020 this isn't the case)
 mindbody_class_id = {
-    'arvada': 'data-hc-mbo-class-id',
-    'aurora': 'data-hc-mbo-class-id',
-    'boulder': 'data-hc-mbo-class-id',
-    'centennial': 'data-hc-mbo-class-id',
-    'denver': 'data-hc-mbo-class-id',
-    'littleton': 'data-bw-widget-mbo-class-id'
+    'arvada': 'data-bw-widget-mbo-class-id',
+    'aurora': 'data-bw-widget-mbo-class-id',
+    'boulder': 'data-bw-widget-mbo-class-id',
+    'centennial': 'data-bw-widget-mbo-class-id',
+    'denver': 'data-bw-widget-mbo-class-id',
+    'littleton': 'data-bw-widget-mbo-class-id',
+    'longmont': 'data-bw-widget-mbo-class-id'
 }
 
 gym_tuple_idx_map = {}
