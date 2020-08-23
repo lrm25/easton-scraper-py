@@ -56,7 +56,6 @@ To run unit tests, enter the following commands:
 	* ``python3 -m unittest discover -v``
 
 ## Future Improvements
-* Add Longmont
 * Use async.io for data retrieval
 * Turn it into a webpage
 * Add a GUI
