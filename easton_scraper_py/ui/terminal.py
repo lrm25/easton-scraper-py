@@ -33,6 +33,7 @@ def parse():
     parser.add_argument("--no-cancelled", help="Don't display cancelled classes", default=False, action='store_true')
     parser.add_argument("--ids", help="Display class IDs to get description", action='store_true')
     parser.add_argument("--description", help="Get description for class with this ID", default="")
+    parser.add_argument("-o", help="Output to file", default="")
     args = parser.parse_args()
 
     # If user specifies, delete classes yesterday and before
@@ -82,7 +83,7 @@ def parse():
             print(e)
     else:
         app.print_classes(class_date, args.days, args.and_string, args.or_string, args.not_string, args.teacher,
-                          args.no_cancelled, args.ids)
+                          args.no_cancelled, args.ids, args.o)
 
     return 0
 

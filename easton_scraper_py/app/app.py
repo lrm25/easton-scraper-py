@@ -1,5 +1,6 @@
 import calendar
 from datetime import date, timedelta
+import os
 
 from data import easton_gym
 from data.easton_gym import EastonGym
@@ -137,6 +138,14 @@ def get_class_description(gym_name, class_id):
 
     return description
 
+# Print data to either terminal or file
+def print_line(line, output_filename):
+    if output_filename == "":
+        print(line)
+        return
+    with open(output_filename, "a") as output_file:
+        output_file.write(line)
+        output_file.write('\n')
 
 #
 # Print requested class info out to terminal which matches all parameters below
@@ -146,8 +155,10 @@ def get_class_description(gym_name, class_id):
 # ids:  print class IDs, which can be used to retrieve class description
 #
 def print_classes(class_start_date, number_of_days, and_strings, or_strings, not_strings,
-                  instructor, no_cancelled, ids):
+                  instructor, no_cancelled, ids, output_file):
 
+    if output_file != "" and os.path.exists(output_file):
+        os.remove(output_file)
     matches = False
     for day_offset in range(number_of_days):
         day_match = False
@@ -162,23 +173,23 @@ def print_classes(class_start_date, number_of_days, and_strings, or_strings, not
                    (instructor == "" or easton_class.get_instructor().lower().find(instructor) != -1) and \
                         not (easton_class.get_cancelled() and no_cancelled):
                     if not day_match:
-                        print(" **** {} **** ".format(fancy_class_date))
+                        print_line(" **** {} **** ".format(fancy_class_date), output_file)
                         day_match = True
                     if not gym_match:
-                        print()
-                        print(" **** {} **** ".format(gym.get_name()))
-                        print()
+                        print_line("", output_file)
+                        print_line(" **** {} **** ".format(gym.get_name()), output_file)
+                        print_line("", output_file)
                         gym_match = True
                         matches = True
-                    print("{}, {}, {}, {}{}{}".format(easton_class.get_start_time(), easton_class.get_end_time(),
+                    print_line("{}, {}, {}, {}{}{}".format(easton_class.get_start_time(), easton_class.get_end_time(),
                           easton_class.get_name(), easton_class.get_instructor(),
                           ", {}".format(easton_class.get_id()) if ids else "",
-                          ', CANCELLED' if easton_class.get_cancelled() else ""))
+                          ', CANCELLED' if easton_class.get_cancelled() else ""), output_file)
         if day_match:
-            print()
-            print()
+            print_line("", output_file)
+            print_line("", output_file)
 
     if not matches:
-        print(" **** NO MATCHES **** ")
-        print()
-        print()
+        print_line(" **** NO MATCHES **** ", output_file)
+        print_line("", output_file)
+        print_line("", output_file)
