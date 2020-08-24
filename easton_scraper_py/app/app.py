@@ -1,4 +1,5 @@
 import calendar
+import datetime
 from datetime import date, timedelta
 import os
 
@@ -138,6 +139,7 @@ def get_class_description(gym_name, class_id):
 
     return description
 
+# TODO print code should be in UI
 # Print data to either terminal or file
 def print_line(line, output_filename):
     if output_filename == "":
@@ -147,6 +149,7 @@ def print_line(line, output_filename):
         output_file.write(line)
         output_file.write('\n')
 
+# TODO print code should be in UI
 #
 # Print requested class info out to terminal which matches all parameters below
 # and_strings, or_strings, not_strings:  see search functions above
@@ -192,4 +195,8 @@ def print_classes(class_start_date, number_of_days, and_strings, or_strings, not
     if not matches:
         print_line(" **** NO MATCHES **** ", output_file)
         print_line("", output_file)
-        print_line("", output_file)
+
+    print_line(" ******************** ", output_file)
+    print_line("", output_file)
+    now = datetime.datetime.now()
+    print_line("Data retrieved on {}".format(now.strftime("%b %d %Y %I:%M%P")), output_file)
