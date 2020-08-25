@@ -30,14 +30,14 @@ The user can retrieve data from all but one Easton gyms (Longmont needs to be ad
 Python 3 must be installed.  BeautifulSoup as well.  To install, run the following commands:
 ```
 sudo apt-get install python3 python3-pip
-pip3 install bs4
+pip3 install bs4 pytz
 ```
 
 Or if using a virtual environment, in the base folder:
 ```
 python3 -m venv env
 env/bin/activate
-pip install bs4
+pip install bs4 pytz
 ```
 
 If running unit tests:

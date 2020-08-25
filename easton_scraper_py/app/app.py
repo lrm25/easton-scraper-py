@@ -200,6 +200,6 @@ def print_classes(class_start_date, number_of_days, and_strings, or_strings, not
 
     print_line(" ******************** ", output_file)
     print_line("", output_file)
-    mst = timezone('America/Denver')
-    now = datetime.datetime.now(mst)
-    print_line("Data retrieved on {}".format(now.strftime("%b %d %Y %I:%M%P")), output_file)
+    mountain_time = timezone('America/Denver')
+    now = datetime.datetime.now(mountain_time)
+    print_line("Data retrieved on {}".format(now.strftime("%b %d %Y %I:%M%P %Z")), output_file)
