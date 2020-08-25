@@ -2,6 +2,8 @@ import calendar
 import datetime
 from datetime import date, timedelta
 import os
+import time
+from pytz import timezone
 
 from data import easton_gym
 from data.easton_gym import EastonGym
@@ -198,5 +200,6 @@ def print_classes(class_start_date, number_of_days, and_strings, or_strings, not
 
     print_line(" ******************** ", output_file)
     print_line("", output_file)
-    now = datetime.datetime.now()
+    mst = timezone('America/Denver')
+    now = datetime.datetime.now(mst)
     print_line("Data retrieved on {}".format(now.strftime("%b %d %Y %I:%M%P")), output_file)
