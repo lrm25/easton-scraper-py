@@ -1,8 +1,72 @@
 import argparse
-from datetime import date, datetime, timedelta
+import datetime
+from datetime import date, timedelta
+from pytz import timezone
 
 from app import app
+from data import easton_gym
 from data.easton_gym import GYM_TUPLES, IDX_TAG_NAME
+
+# Print data to either terminal or file
+def print_line(line, output_filename):
+    if output_filename == "":
+        print(line)
+        return
+    with open(output_filename, "a") as output_file:
+        output_file.write(line)
+        output_file.write('\n')
+
+#
+# Print requested class info out to terminal which matches all parameters below
+# and_strings, or_strings, not_strings:  see search functions above
+# instructor:  string which can be used to search for classes by a certain teacher
+# no_cancelled:  only print classes that are not cancelled
+# ids:  print class IDs, which can be used to retrieve class description
+#
+def print_classes(class_start_date, number_of_days, and_strings, or_strings, not_strings,
+                  instructor, no_cancelled, ids, output_file):
+
+    if output_file != "" and os.path.exists(output_file):
+        os.remove(output_file)
+    matches = False
+    for day_offset in range(number_of_days):
+        day_match = False
+        class_date_object = class_start_date + timedelta(days=day_offset)
+        class_date = class_date_object.strftime("%Y-%m-%d")
+        fancy_class_date = class_date_object.strftime("%A, %B %d, %Y")
+        for gym_key in sorted(easton_gym.gym_dict.keys()):
+            gym = easton_gym.gym_dict[gym_key]
+            gym_match = False
+            for easton_class in gym.get_classes(class_date):
+                if app.string_searches(easton_class.get_name(), and_strings, or_strings, not_strings) and \
+                   (instructor == "" or easton_class.get_instructor().lower().find(instructor) != -1) and \
+                        not (easton_class.get_cancelled() and no_cancelled):
+                    if not day_match:
+                        print_line(" **** {} **** ".format(fancy_class_date), output_file)
+                        day_match = True
+                    if not gym_match:
+                        print_line("", output_file)
+                        print_line(" **** {} **** ".format(gym.get_name()), output_file)
+                        print_line("", output_file)
+                        gym_match = True
+                        matches = True
+                    print_line("{}, {}, {}, {}{}{}".format(easton_class.get_start_time(), easton_class.get_end_time(),
+                          easton_class.get_name(), easton_class.get_instructor(),
+                          ", {}".format(easton_class.get_id()) if ids else "",
+                          ', CANCELLED' if easton_class.get_cancelled() else ""), output_file)
+        if day_match:
+            print_line("", output_file)
+            print_line("", output_file)
+
+    if not matches:
+        print_line(" **** NO MATCHES **** ", output_file)
+        print_line("", output_file)
+
+    print_line(" ******************** ", output_file)
+    print_line("", output_file)
+    mountain_time = timezone('America/Denver')
+    now = datetime.datetime.now(mountain_time)
+    print_line("Data retrieved on {}".format(now.strftime("%b %d %Y %I:%M%P %Z")), output_file)
 
 
 #
@@ -82,8 +146,8 @@ def parse():
         except ValueError as e:
             print(e)
     else:
-        app.print_classes(class_date, args.days, args.and_string, args.or_string, args.not_string, args.teacher,
-                          args.no_cancelled, args.ids, args.o)
+        print_classes(class_date, args.days, args.and_string, args.or_string, args.not_string, args.teacher,
+                      args.no_cancelled, args.ids, args.o)
 
     return 0
 
