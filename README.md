@@ -2,7 +2,7 @@
 A portfolio project which consolidates data from the Easton gyms in the Denver area, and allows a user to search classes at all gyms at once.
 
 ## Operation
-The user can retrieve data from all but one Easton gyms (Longmont needs to be added), have it stored locally, and search class names and instructors.  Enter the **easton_scraper_py** folder, then the commands below can be entered.
+The user can retrieve data from all Easton gyms, have it stored locally, and search class names and instructors.  Enter the **easton_scraper_py** folder, then the commands below can be entered.
 
 **Example commands:**
 * To retrieve data from all gyms for today, just run the program without parameters: 
@@ -42,6 +42,7 @@ pip install bs4 pytz
 
 Or just use the pipfile:
 ```
+pip3 install pipenv
 pipenv run python scraper.py
 ```
 
