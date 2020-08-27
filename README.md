@@ -40,6 +40,11 @@ env/bin/activate
 pip install bs4 pytz
 ```
 
+Or just use the pipfile:
+```
+pipenv run python scraper.py
+```
+
 If running unit tests:
 ```
 pip3 install mock
