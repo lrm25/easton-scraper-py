@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from data.easton_class import EastonClass
 from storage import db
 
-from . import html_request
+from web import html_request
 
 
 #

@@ -4,7 +4,7 @@ from data.easton_class import EastonClass
 from data.easton_gym import mindbody_class_id
 from storage import db
 
-from . import html_request
+from web import html_request
 
 
 #
