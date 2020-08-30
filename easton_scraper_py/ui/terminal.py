@@ -1,6 +1,6 @@
 import argparse
 import datetime
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from pytz import timezone
 
 from app import app
@@ -65,7 +65,7 @@ def print_classes(class_start_date, number_of_days, and_strings, or_strings, not
     print_line(" ******************** ", output_file)
     print_line("", output_file)
     mountain_time = timezone('America/Denver')
-    now = datetime.datetime.now(mountain_time)
+    now = datetime.now(mountain_time)
     print_line("Data retrieved on {}".format(now.strftime("%b %d %Y %I:%M%P %Z")), output_file)
 
 
@@ -85,7 +85,7 @@ def parse():
     day_group = parser.add_mutually_exclusive_group()
     day_group.add_argument("--tomorrow", help="Print tomorrow's classes", action='store_true')
     day_group.add_argument("--weekday", help="Print classes for this upcoming weekday")
-    day_group.add_argument("--date", help="Display classes on specific date (format:  YYYY-MM-DD")
+    day_group.add_argument("--date", help="Display classes on specific date (format:  YYYY-MM-DD)")
     parser.add_argument("--days", help="Total days to print", default=1, type=int)
     parser.add_argument("--delete", help="Delete old classes", action='store_true')
     parser.add_argument("--gym", help="Search these gyms' schedules only", choices=gym_options, default=[],
