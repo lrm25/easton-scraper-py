@@ -8,6 +8,8 @@ verify_ssl = true
 [packages]
 bs4 = "*"
 pytz = "*"
+aiohttp = "*"
+aiofiles = "*"
 
 [requires]
 python_version = "3.7"

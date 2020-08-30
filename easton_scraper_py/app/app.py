@@ -1,3 +1,4 @@
+import asyncio
 import calendar
 import datetime
 from datetime import date, timedelta
@@ -41,7 +42,7 @@ def delete_old_classes():
 #
 def retrieve_classes(class_date, gyms, number_of_days):
     
-    easton_calendar.get_and_parse_gyms_data(gyms, class_date, number_of_days)
+    asyncio.run(easton_calendar.get_and_parse_gyms_data(gyms, class_date, number_of_days))
 
 
 #

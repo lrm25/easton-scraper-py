@@ -10,9 +10,9 @@ from web import html_request
 #
 # get the underlying mindbody widget ID so the easton calendar mindbody framework can be accessed
 #
-def get_mindbody_widget_id(easton_calendar_url):
+async def get_mindbody_widget_id(easton_calendar_url):
 
-    easton_calendar_soup = html_request.request(easton_calendar_url)
+    easton_calendar_soup = await html_request.request(easton_calendar_url)
     if not easton_calendar_soup:
         print("Error:  {} request returned error or empty page".format(easton_calendar_url))
         return None
@@ -33,11 +33,11 @@ def get_mindbody_widget_id(easton_calendar_url):
 #
 # Get mindbody calendar page data using mindbody widget ID in easton html
 #
-def get_mindbody_calendar_data(widget_id, class_date):
+async def get_mindbody_calendar_data(widget_id, class_date):
 
     mindbody_url = "https://widgets.healcode.com/widgets/schedules/{}/print?options%5Bstart_date%5D={}".format(
         widget_id, class_date)
-    mindbody_page_data = html_request.request(mindbody_url)
+    mindbody_page_data = await html_request.request(mindbody_url)
     if not mindbody_page_data:
         print("Error retrieving mindbody page data with widget ID {}".format(widget_id))
     return mindbody_page_data
@@ -105,17 +105,17 @@ def parse_single_class(table_row, gym, class_date_str):
 #
 # Parse mindbody calendar data for a single gym, single day
 #
-def get_and_parse_single_day(gym, class_date):
+async def get_and_parse_single_day(gym, class_date):
 
     class_date_str = class_date.strftime("%Y-%m-%d")
 
     print("Retrieving {} data for {} gym".format(class_date_str, gym.get_name()))
-    widget_id = get_mindbody_widget_id(gym.get_url())
+    widget_id = await get_mindbody_widget_id(gym.get_url())
     if not widget_id:
         print("Unable to retrieve class data for gym {} on {}".format(gym.get_name(), class_date_str))
         return
 
-    mindbody_page_data = get_mindbody_calendar_data(widget_id, class_date)
+    mindbody_page_data = await get_mindbody_calendar_data(widget_id, class_date)
     if not mindbody_page_data:
         print("Unable to retrieve mindbody calendar data for gym {} on {}".format(gym.get_name(), class_date_str))
 

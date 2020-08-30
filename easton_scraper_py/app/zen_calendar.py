@@ -9,9 +9,9 @@ from web import html_request
 #
 # Get Zen weekly calendar, return soup if dates match up
 #
-def retrieve_week_calendar_and_check_date(gym, date_string, offset_date):
+async def retrieve_week_calendar_and_check_date(gym, date_string, offset_date):
 
-    soup = html_request.request(gym.get_url() + "?DATE=" + date_string + "&VIEW=WEEK")
+    soup = await html_request.request(gym.get_url() + "?DATE=" + date_string + "&VIEW=WEEK")
 
     # check week (only for ridiculous dates like one in the year 19 A.D.)
     week_description = soup.find('div', {'align': 'center'}).text.replace("Week of ", "")
@@ -27,7 +27,7 @@ def retrieve_week_calendar_and_check_date(gym, date_string, offset_date):
 #
 # Retrieve and parse an individual class
 #
-def parse_class(calendar_class, webpage_base, date_string, gym):
+async def parse_class(calendar_class, webpage_base, date_string, gym):
 
     name = calendar_class.text.strip()
     # Class info URL query is in single quotes in 'onclick' attribute
@@ -36,7 +36,7 @@ def parse_class(calendar_class, webpage_base, date_string, gym):
     class_link_query = class_link_attr.split('\'')[1]
     class_id = class_link_query.split('?')[1].split('=')[1]
     class_link = "{}{}".format(webpage_base, class_link_query)
-    class_soup = html_request.request(class_link)
+    class_soup = await html_request.request(class_link)
     class_rows = class_soup.find_all('tr')
     instructor = "Staff"
     time_found = False
@@ -78,7 +78,7 @@ def parse_class(calendar_class, webpage_base, date_string, gym):
 #
 # Scrape class data from gyms that use zencalendar
 #
-def get_calendar_daily_data(gym, first_date, number_of_days):
+async def get_calendar_daily_data(gym, first_date, number_of_days):
 
     soup = None
     retrieve_new_week = True
@@ -89,7 +89,7 @@ def get_calendar_daily_data(gym, first_date, number_of_days):
             retrieve_new_week = True
         date_string = offset_date.strftime("%Y-%m-%d")
         if retrieve_new_week:
-            soup = retrieve_week_calendar_and_check_date(gym, date_string, offset_date)
+            soup = await retrieve_week_calendar_and_check_date(gym, date_string, offset_date)
             if not soup:
                 return
 
@@ -103,16 +103,16 @@ def get_calendar_daily_data(gym, first_date, number_of_days):
         # strip string "calendar.cfm" (12 chars)
         webpage_base = gym.get_url().replace("calendar.cfm", "")
         for calendar_class in calendar_classes:
-            parse_class(calendar_class, webpage_base, date_string, gym)
+            await parse_class(calendar_class, webpage_base, date_string, gym)
 
 
 #
 # Get a class description from online, if available
 #
-def get_class_description(description_link):
+async def get_class_description(description_link):
 
     description = ""
-    soup = html_request.request(description_link)
+    soup = await html_request.request(description_link)
     divs = soup.find_all('div')
     for div in divs:
         # Identification:  div class="spaceBelow", no children
