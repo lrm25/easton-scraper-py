@@ -135,9 +135,9 @@ def get_class_description(gym_name, class_id):
 
     link = db.get_class_description_link(gym_name, class_id)
     if gym_name == 'Castle_Rock' or gym_name == 'Thornton':
-        description = zen_calendar.get_class_description(link)
+        description = asyncio.run(zen_calendar.get_class_description(link))
     else:
-        description = mindbody_calendar.get_class_description(link)
+        description = asyncio.run(mindbody_calendar.get_class_description(link))
 
     return description
 

@@ -157,10 +157,10 @@ def check_header_date(mindbody_page_data, class_date_str):
 #
 # Return a class description pulled from online, if it exists
 #
-def get_class_description(description_link):
+async def get_class_description(description_link):
 
     description = ""
-    soup = html_request.request(description_link)
+    soup = await html_request.request(description_link)
     divs = soup.find_all('div')
     for div in divs:
         div_class = div.get('class')
